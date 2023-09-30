@@ -306,10 +306,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Auxiliar
+; Auxiliares
 (define simbolo-or?
   (lambda (simboloXD)
     (eqv? simboloXD 'or)
+  )
+)
+
+(define simbolo-and?
+  (lambda (simboloXD)
+    (eqv? simboloXD 'and)
+  )
+)
+
+(define simbolo-FNC?
+  (lambda (simboloXD)
+    (eqv? simboloXD 'FNC)
+  )
+)
+
+(define entero-mayor-a-cero?
+  (lambda (numeroXD)
+    (and (integer? numeroXD) (> numeroXD 0))
   )
 )
 
@@ -322,19 +340,19 @@
 ; <clausula> ::= (<variable-o--variable> or <clausula>)
 (define-datatype t-clausula t-clausula?
   (v-variable-o--variable (c-variable-o--variable t-variable-o--variable?))
-  (v-variable-o--variable-or-clausula (c-variable-o--variable t-variable-o--variable?) (or simbolo-or?) (c-clausula t-clausula?))
+  (v-variable-o--variable-or-clausula (c-variable-o--variable t-variable-o--variable?) (-or- simbolo-or?) (c-clausula t-clausula?))
 )
 
 ; <conjuncion-de-clausulas> ::= (<clausula>)
 ; <conjuncion-de-clausulas> ::= (<clausula> and <conjuncion-de-clausulas>)
-;(define-datatype -conjuncion-de-clausulas conjuncion-de-clausulas?
-;  (clausula- ())
-;)
+(define-datatype t-conjuncion-de-clausulas t-conjuncion-de-clausulas?
+  (v-clausula (c-clausula t-clausula?))
+  (v-clausula-conjuncion-de-clausulas (c-clausula t-clausula?) (-and- simbolo-and?) (c-conjuncion-de-clausulas t-conjuncion-de-clausulas?))
+)
 
 ; <expresion-FNC> ::= FNC <entero> <conjuncion-de-clausulas>
-
-(define-datatype expresion-FNC expresion-FNC?
-  (FNC (entero integer?))
+(define-datatype t-expresion-FNC expresion-FNC?
+  (v-expresion-FNC (-FNC- simbolo-FNC?) (-entero-mayo-a-cero- entero-mayor-a-cero?) (c-conjuncion-de-clausulas t-conjuncion-de-clausulas?))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -385,10 +403,48 @@
 (display t-clausula_6)
 (newline)
 
+;;;;;;;;;;;
 
+(define t-conjuncion_1 (v-clausula t-clausula_1))
+(define t-conjuncion_2 (v-clausula-conjuncion-de-clausulas t-clausula_3 'and t-conjuncion_1))
+(define t-conjuncion_3 (v-clausula-conjuncion-de-clausulas t-clausula_5 'and t-conjuncion_2))
+(define t-conjuncion_4 (v-clausula t-clausula_2))
+(define t-conjuncion_5 (v-clausula-conjuncion-de-clausulas t-clausula_4 'and t-conjuncion_4))
+(define t-conjuncion_6 (v-clausula-conjuncion-de-clausulas t-clausula_6 'and t-conjuncion_5))
 
+(newline)
+(display t-conjuncion_1)
+(newline)
+(display t-conjuncion_2)
+(newline)
+(display t-conjuncion_3)
+(newline)
+(display t-conjuncion_4)
+(newline)
+(display t-conjuncion_5)
+(newline)
+(display t-conjuncion_6)
+(newline)
 
+;;;;;;;;;;;
 
+(define t-fnc_1 (v-expresion-FNC 'FNC 1 t-conjuncion_1))
+(define t-fnc_2 (v-expresion-FNC 'FNC 3 t-conjuncion_2))
+(define t-fnc_3 (v-expresion-FNC 'FNC 3 t-conjuncion_3))
+(define t-fnc_4 (v-expresion-FNC 'FNC 2 t-conjuncion_4))
+(define t-fnc_5 (v-expresion-FNC 'FNC 2 t-conjuncion_5))
+(define t-fnc_6 (v-expresion-FNC 'FNC 3 t-conjuncion_6))
 
-
-
+(newline)
+(display t-fnc_1)
+(newline)
+(display t-fnc_2)
+(newline)
+(display t-fnc_3)
+(newline)
+(display t-fnc_4)
+(newline)
+(display t-fnc_5)
+(newline)
+(display t-fnc_6)
+(newline)
