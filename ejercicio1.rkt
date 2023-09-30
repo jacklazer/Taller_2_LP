@@ -19,10 +19,10 @@
 ; <conjuncion-de-clausulas> ::= (<clausula>)
 ;                           ::= (<clausula> and <conjuncion-de-clausulas>)
 ;
-; <clausula> ::= (<variable-o-su-negacion>)
-;            ::= (<variable-o-su-negacion> or <clausula>)
+; <clausula> ::= (<variable-o--variable>)
+;            ::= (<variable-o--variable> or <clausula>)
 ;
-; <variable-o-su-negacion> ::= <entero-diferente-a-cero>
+; <variable-o--variable> ::= <entero-diferente-a-cero>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -44,8 +44,8 @@
   )
 )
 
-; <variable-o-su-negacion> ::= <entero-diferente-a-cero>
-(define variable-o-su-negacion
+; <variable-o--variable> ::= <entero-diferente-a-cero>
+(define variable-o--variable
   (lambda (entero)
     (cond
       [(entero-no-cero? entero) entero]
@@ -57,17 +57,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Constructores or
 
-; <clausula> ::= (<variable-o-su-negacion>)
+; <clausula> ::= (<variable-o--variable>)
 (define or-var
-  (lambda (var-o-n)
-    (cons var-o-n '())
+  (lambda (var-o--var)
+    (cons var-o--var '())
   )
 )
 
-; <clausula> ::= (<variable-o-su-negacion> or <clausula>)
+; <clausula> ::= (<variable-o--variable> or <clausula>)
 (define or-var-clau
-  (lambda (var-o-n clau)
-    (cons var-o-n (cons 'or clau))
+  (lambda (var-o--var clau)
+    (cons var-o--var (cons 'or clau))
   )
 )
 
@@ -158,12 +158,12 @@
 ; Utilización y creación de por lo menos 3 instancias SAT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define variable_1 (variable-o-su-negacion 1))
-(define variable_2 (variable-o-su-negacion 2))
-(define variable_3 (variable-o-su-negacion 3))
-(define variable_-1 (variable-o-su-negacion -1))
-(define variable_-2 (variable-o-su-negacion -2))
-(define variable_-3 (variable-o-su-negacion -3))
+(define variable_1 (variable-o--variable 1))
+(define variable_2 (variable-o--variable 2))
+(define variable_3 (variable-o--variable 3))
+(define variable_-1 (variable-o--variable -1))
+(define variable_-2 (variable-o--variable -2))
+(define variable_-3 (variable-o--variable -3))
 
 (newline)
 (display variable_1)
@@ -313,24 +313,23 @@
   )
 )
 
-; <variable-o-su-negacion> ::= <entero-diferente-a-cero>
-(define-datatype -variable-o-su-negacion -variable-o-su-negacion?
-  (entero-diferente-a-cero (entero entero-no-cero?))
+; <variable-o--variable> ::= <entero-diferente-a-cero>
+(define-datatype t-variable-o--variable t-variable-o--variable?
+  (v-entero-diferente-a-cero (entero entero-no-cero?))
 )
 
-; <clausula> ::= (<variable-o-su-negacion>)
-; <clausula> ::= (<variable-o-su-negacion> or <clausula>)
-(define-datatype -clausula clausula?
-  (variable- (variable-- -variable-o-su-negacion?))
-  (variable-or-clausula (variable-- -variable-o-su-negacion?) (or simbolo-or?) (-clausula clausula?))
+; <clausula> ::= (<variable-o--variable>)
+; <clausula> ::= (<variable-o--variable> or <clausula>)
+(define-datatype t-clausula t-clausula?
+  (v-variable-o--variable (c-variable-o--variable t-variable-o--variable?))
+  (v-variable-o--variable-or-clausula (c-variable-o--variable t-variable-o--variable?) (or simbolo-or?) (c-clausula t-clausula?))
 )
 
 ; <conjuncion-de-clausulas> ::= (<clausula>)
 ; <conjuncion-de-clausulas> ::= (<clausula> and <conjuncion-de-clausulas>)
-
-(define-datatype conjuncion-de-clausulas conjuncion-de-clausulas?
-  (clausula- (entero integer?))
-)
+;(define-datatype -conjuncion-de-clausulas conjuncion-de-clausulas?
+;  (clausula- ())
+;)
 
 ; <expresion-FNC> ::= FNC <entero> <conjuncion-de-clausulas>
 
@@ -342,48 +341,48 @@
 ; Utilización y creación de por lo menos 3 instancias SAT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define variable_1- (entero-diferente-a-cero 1))
-(define variable_2- (entero-diferente-a-cero 2))
-(define variable_3- (entero-diferente-a-cero 3))
-(define variable_4- (entero-diferente-a-cero -1))
-(define variable_5- (entero-diferente-a-cero -2))
-(define variable_6- (entero-diferente-a-cero -3))
+(define t-variable_1 (v-entero-diferente-a-cero 1))
+(define t-variable_2 (v-entero-diferente-a-cero 2))
+(define t-variable_3 (v-entero-diferente-a-cero 3))
+(define t-variable_4 (v-entero-diferente-a-cero -1))
+(define t-variable_5 (v-entero-diferente-a-cero -2))
+(define t-variable_6 (v-entero-diferente-a-cero -3))
 
 (newline)
-(display variable_1-)
+(display t-variable_1)
 (newline)
-(display variable_2-)
+(display t-variable_2)
 (newline)
-(display variable_3-)
+(display t-variable_3)
 (newline)
-(display variable_4-)
+(display t-variable_4)
 (newline)
-(display variable_5-)
+(display t-variable_5)
 (newline)
-(display variable_6-)
+(display t-variable_6)
 (newline)
 
 ;;;;;;;;;;;
 
-(define clausula_1- (variable- variable_1-))
-(define clausula_2- (variable-or-clausula variable_2- 'or clausula_1-))
-(define clausula_3- (variable-or-clausula variable_6- 'or clausula_2-))
-(define clausula_4- (variable- variable_4-))
-(define clausula_5- (variable-or-clausula variable_5- 'or clausula_4-))
-(define clausula_6- (variable-or-clausula variable_3- 'or clausula_5-))
+(define t-clausula_1 (v-variable-o--variable t-variable_1))
+(define t-clausula_2 (v-variable-o--variable-or-clausula t-variable_2 'or t-clausula_1))
+(define t-clausula_3 (v-variable-o--variable-or-clausula t-variable_6 'or t-clausula_2))
+(define t-clausula_4 (v-variable-o--variable t-variable_4))
+(define t-clausula_5 (v-variable-o--variable-or-clausula t-variable_5 'or t-clausula_4))
+(define t-clausula_6 (v-variable-o--variable-or-clausula t-variable_3 'or t-clausula_5))
 
 (newline)
-(display clausula_1-)
+(display t-clausula_1)
 (newline)
-(display clausula_2-)
+(display t-clausula_2)
 (newline)
-(display clausula_3-)
+(display t-clausula_3)
 (newline)
-(display clausula_4-)
+(display t-clausula_4)
 (newline)
-(display clausula_5-)
+(display t-clausula_5)
 (newline)
-(display clausula_6-)
+(display t-clausula_6)
 (newline)
 
 
