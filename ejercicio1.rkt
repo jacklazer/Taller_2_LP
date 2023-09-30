@@ -7,6 +7,10 @@
 ; Yissy Katherine Posso Perea - 202181910
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Gramática BNF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Gramatica BNF:
 ;
@@ -21,13 +25,37 @@
 ; <variable> ::= <entero-diferente-a-cero>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Implementación de la gramática basada en listas
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Constructores (fnc, and, or)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Auxiliar y constructor de variable
+
+; Auxiliar
+(define entero-no-cero?
+  (lambda (numeroXD)
+    (and (integer? numeroXD) (not (eqv? numeroXD 0)))
+  )
+)
 
 ; <variable> ::= <entero-diferente-a-cero>
 (define variable
   (lambda (entero)
-    entero
+    (cond
+      [(entero-no-cero? entero) entero]
+      [else "Error"]
+    )
   )
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Constructores or
 
 ; <clausula> ::= (<variable>)
 (define or-var
@@ -43,6 +71,9 @@
   )
 )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Constructores and
+
 ; <conjuncion-de-clausulas> ::= (<clausula>)
 (define and-clau
   (lambda (clau)
@@ -57,6 +88,9 @@
   )
 )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Constructor fnc
+
 ; <expresion-FNC> ::= FNC <entero> <conjuncion-de-clausulas>
 (define fnc
   (lambda (ent conj-clau)
@@ -65,3 +99,255 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Extractores (fnc − > var, fnc− >clausulas, or− > varlist)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Extractor fnc->var
+
+(define fnc->var
+  (lambda (fnc-)
+    (car (cdr fnc-))
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Extractor fnc−>clausulas
+
+(define aux-fnc->clausulas
+  (lambda (conjuncion)
+    (cond
+      [(null? conjuncion) 0]
+      [(list? (car conjuncion)) (+ 1 (aux-fnc->clausulas (cdr conjuncion)))]
+      [else (+ 0 (aux-fnc->clausulas (cdr conjuncion)))]
+    )
+  )
+)
+
+(define fnc->clausulas
+  (lambda (fnc-)
+    (aux-fnc->clausulas (caddr fnc-))
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Extractor or−>varlist
+#|
+(define or->varlist
+  (lambda (or-)
+    (cond
+      [(null? or-) '()]
+      [(#|entero-no-cero?|#integer? (car or-)) (cons (car or-) (or->varlist (cdr or-)))]
+      [else (or->varlist (cdr or-))]
+    )
+  )
+)|#
+
+(define or->varlist
+  (lambda (or-)
+    (cond
+      [(null? or-) '()]
+      [(not (number? (car or-))) (or->varlist (cdr or-))]
+      [(> (car or-) 0) (cons (car or-) (or->varlist (cdr or-)))]
+      [else (cons (* (car or-) -1) (or->varlist (cdr or-)))]
+    )
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Utilización y creación de por lo menos 3 instancias SAT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define variable_1 (variable 1))
+(define variable_2 (variable 2))
+(define variable_3 (variable 3))
+(define variable_-1 (variable -1))
+(define variable_-2 (variable -2))
+(define variable_-3 (variable -3))
+
+(newline)
+(display variable_1)
+(newline)
+(display variable_2)
+(newline)
+(display variable_3)
+(newline)
+(display variable_-1)
+(newline)
+(display variable_-2)
+(newline)
+(display variable_-3)
+(newline)
+
+;;;;;;;;;;;
+
+(define clausula_1 (or-var variable_1))
+(define clausula_2 (or-var-clau variable_2 clausula_1))
+(define clausula_3 (or-var-clau variable_-3 clausula_2))
+(define clausula_4 (or-var variable_-1))
+(define clausula_5 (or-var-clau variable_-2 clausula_4))
+(define clausula_6 (or-var-clau variable_3 clausula_5))
+
+(newline)
+(display clausula_1)
+(newline)
+(display clausula_2)
+(newline)
+(display clausula_3)
+(newline)
+(display clausula_4)
+(newline)
+(display clausula_5)
+(newline)
+(display clausula_6)
+(newline)
+
+;;;;;;;;;;;
+
+(define conjuncion_1 (and-clau clausula_1))
+(define conjuncion_2 (and-clau-conj clausula_3 conjuncion_1))
+(define conjuncion_3 (and-clau-conj clausula_5 conjuncion_2))
+(define conjuncion_4 (and-clau clausula_2))
+(define conjuncion_5 (and-clau-conj clausula_4 conjuncion_4))
+(define conjuncion_6 (and-clau-conj clausula_6 conjuncion_5))
+
+(newline)
+(display conjuncion_1)
+(newline)
+(display conjuncion_2)
+(newline)
+(display conjuncion_3)
+(newline)
+(display conjuncion_4)
+(newline)
+(display conjuncion_5)
+(newline)
+(display conjuncion_6)
+(newline)
+
+;;;;;;;;;;;
+
+(define fnc_1 (fnc 1 conjuncion_1))
+(define fnc_2 (fnc 3 conjuncion_2))
+(define fnc_3 (fnc 3 conjuncion_3))
+(define fnc_4 (fnc 2 conjuncion_4))
+(define fnc_5 (fnc 2 conjuncion_5))
+(define fnc_6 (fnc 3 conjuncion_6))
+
+(newline)
+(display fnc_1)
+(newline)
+(display fnc_2)
+(newline)
+(display fnc_3)
+(newline)
+(display fnc_4)
+(newline)
+(display fnc_5)
+(newline)
+(display fnc_6)
+(newline)
+
+;;;;;;;;;;;
+
+(newline)
+(display (fnc->var fnc_1))
+(display "|")
+(display (fnc->clausulas fnc_1))
+(display "|")
+(display (or->varlist (car (caddr fnc_1))))
+(newline)
+(display (fnc->var fnc_2))
+(display "|")
+(display (fnc->clausulas fnc_2))
+(display "|")
+(display (or->varlist (car (caddr fnc_2))))
+(display "|")
+(display (or->varlist (caddr (caddr fnc_2))))
+(newline)
+(display (fnc->var fnc_3))
+(display "|")
+(display (fnc->clausulas fnc_3))
+(display "|")
+(display (or->varlist (car (caddr fnc_3))))
+(display "|")
+(display (or->varlist (caddr (caddr fnc_3))))
+(display "|")
+(display (or->varlist (car (cddddr (caddr fnc_3)))))
+(newline)
+(display (fnc->var fnc_4))
+(display "|")
+(display (fnc->clausulas fnc_4))
+(display "|")
+(display (or->varlist (car (caddr fnc_4))))
+(newline)
+(display (fnc->var fnc_5))
+(display "|")
+(display (fnc->clausulas fnc_5))
+(display "|")
+(display (or->varlist (car (caddr fnc_5))))
+(display "|")
+(display (or->varlist (caddr (caddr fnc_5))))
+(newline)
+(display (fnc->var fnc_6))
+(display "|")
+(display (fnc->clausulas fnc_6))
+(display "|")
+(display (or->varlist (car (caddr fnc_6))))
+(display "|")
+(display (or->varlist (caddr (caddr fnc_6))))
+(display "|")
+(display (or->varlist (car (cddddr (caddr fnc_6)))))
+(newline)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Implementación basada en datatypes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#|
+; Auxiliar
+(define simbolo-or?
+  (lambda (simboloXD)
+    (eqv? simboloXD 'or)
+  )
+)
+
+; <variable> ::= <entero-diferente-a-cero>
+(define-datatype -variable variable?
+  (entero-diferente-a-cero (entero entero-no-cero?))
+)
+
+; <clausula> ::= (<variable>)
+; <clausula> ::= (<variable> or <clausula>)
+(define-datatype -clausula clausula?
+  (variable- (variable- variable?))
+  (variable-or-clausula (variable- variable?) (or simbolo-or?) (-clausula clausula?))
+)
+
+; <conjuncion-de-clausulas> ::= (<clausula>)
+; <conjuncion-de-clausulas> ::= (<clausula> and <conjuncion-de-clausulas>)
+
+(define-datatype conjuncion-de-clausulas conjuncion-de-clausulas?
+  (clausula- (entero integer?))
+)
+
+; <expresion-FNC> ::= FNC <entero> <conjuncion-de-clausulas>
+
+(define-datatype expresion-FNC expresion-FNC?
+  (FNC (entero integer?))
+)
+
+|#
+
+
+
+
+
+
+
+
+
+
+
