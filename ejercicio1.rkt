@@ -131,7 +131,7 @@
   (lambda (or-)
     (cond
       [(null? or-) '()]
-      [(entero-no-cero? (car or-)) (cons (car or-) (or->varlist (cdr or-)))]
+      [(#|entero-no-cero?|# integer? (car or-)) (cons (car or-) (or->varlist (cdr or-)))]
       [else (or->varlist (cdr or-))]
     )
   )
@@ -345,9 +345,9 @@
 (define t-variable_1 (v-entero-diferente-a-cero 1))
 (define t-variable_2 (v-entero-diferente-a-cero 2))
 (define t-variable_3 (v-entero-diferente-a-cero 3))
-(define t-variable_4 (v-entero-diferente-a-cero -1))
-(define t-variable_5 (v-entero-diferente-a-cero -2))
-(define t-variable_6 (v-entero-diferente-a-cero -3))
+(define t-variable_-4 (v-entero-diferente-a-cero -1))
+(define t-variable_-5 (v-entero-diferente-a-cero -2))
+(define t-variable_-6 (v-entero-diferente-a-cero -3))
 
 (newline)
 (display t-variable_1)
@@ -356,20 +356,20 @@
 (newline)
 (display t-variable_3)
 (newline)
-(display t-variable_4)
+(display t-variable_-4)
 (newline)
-(display t-variable_5)
+(display t-variable_-5)
 (newline)
-(display t-variable_6)
+(display t-variable_-6)
 (newline)
 
 ;;;;;;;;;;;
 
 (define t-clausula_1 (v-variable-o--variable t-variable_1))
 (define t-clausula_2 (v-variable-o--variable-or-clausula t-variable_2 'or t-clausula_1))
-(define t-clausula_3 (v-variable-o--variable-or-clausula t-variable_6 'or t-clausula_2))
-(define t-clausula_4 (v-variable-o--variable t-variable_4))
-(define t-clausula_5 (v-variable-o--variable-or-clausula t-variable_5 'or t-clausula_4))
+(define t-clausula_3 (v-variable-o--variable-or-clausula t-variable_-6 'or t-clausula_2))
+(define t-clausula_4 (v-variable-o--variable t-variable_-4))
+(define t-clausula_5 (v-variable-o--variable-or-clausula t-variable_-5 'or t-clausula_4))
 (define t-clausula_6 (v-variable-o--variable-or-clausula t-variable_3 'or t-clausula_5))
 
 (newline)
