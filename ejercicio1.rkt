@@ -55,21 +55,19 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Constructores or
+; Constructor or
 
 ; <clausula> ::= (<variable-o--variable>)
-(define or-var
-  (lambda (var-o--var)
-    (cons var-o--var '())
+; <clausula> ::= (<variable-o--variable> or <clausula>)
+(define or
+  (lambda (var-o--var clau)
+    (cond
+      [(null? clau) (cons var-o--var clau)]
+      [else (cons var-o--var (cons 'or clau))]
+    )
   )
 )
 
-; <clausula> ::= (<variable-o--variable> or <clausula>)
-(define or-var-clau
-  (lambda (var-o--var clau)
-    (cons var-o--var (cons 'or clau))
-  )
-)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Constructores and
@@ -170,12 +168,12 @@
 
 ;;;;;;;;;;;
 
-(define clausula_1 (or-var variable_1))
-(define clausula_2 (or-var-clau variable_2 clausula_1))
-(define clausula_3 (or-var-clau variable_-3 clausula_2))
-(define clausula_4 (or-var variable_-1))
-(define clausula_5 (or-var-clau variable_-2 clausula_4))
-(define clausula_6 (or-var-clau variable_3 clausula_5))
+(define clausula_1 (or variable_1 '()))
+(define clausula_2 (or variable_2 clausula_1))
+(define clausula_3 (or variable_-3 clausula_2))
+(define clausula_4 (or variable_-1 '()))
+(define clausula_5 (or variable_-2 clausula_4))
+(define clausula_6 (or variable_3 clausula_5))
 
 (newline)
 (display clausula_1)
