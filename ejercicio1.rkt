@@ -68,21 +68,17 @@
   )
 )
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Constructores and
 
 ; <conjuncion-de-clausulas> ::= (<clausula>)
-(define and-clau
-  (lambda (clau)
-    (cons clau '())
-  )
-)
-
 ; <conjuncion-de-clausulas> ::= (<clausula> and <conjuncion-de-clausulas>)
-(define and-clau-conj
+(define and
   (lambda (clau conj)
-    (cons clau (cons 'and conj))
+    (cond
+      [(null? conj) (cons clau conj)]
+      [else (cons clau (cons 'and conj))]
+    )
   )
 )
 
@@ -191,12 +187,12 @@
 
 ;;;;;;;;;;;
 
-(define conjuncion_1 (and-clau clausula_1))
-(define conjuncion_2 (and-clau-conj clausula_3 conjuncion_1))
-(define conjuncion_3 (and-clau-conj clausula_5 conjuncion_2))
-(define conjuncion_4 (and-clau clausula_2))
-(define conjuncion_5 (and-clau-conj clausula_4 conjuncion_4))
-(define conjuncion_6 (and-clau-conj clausula_6 conjuncion_5))
+(define conjuncion_1 (and clausula_1 '()))
+(define conjuncion_2 (and clausula_3 conjuncion_1))
+(define conjuncion_3 (and clausula_5 conjuncion_2))
+(define conjuncion_4 (and clausula_2 '()))
+(define conjuncion_5 (and clausula_4 conjuncion_4))
+(define conjuncion_6 (and clausula_6 conjuncion_5))
 
 (newline)
 (display conjuncion_1)
