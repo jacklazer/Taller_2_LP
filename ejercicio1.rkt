@@ -132,24 +132,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Extractor or−>varlist
-#|
-(define or->varlist
-  (lambda (or-)
-    (cond
-      [(null? or-) '()]
-      [(#|entero-no-cero?|#integer? (car or-)) (cons (car or-) (or->varlist (cdr or-)))]
-      [else (or->varlist (cdr or-))]
-    )
-  )
-)|#
 
 (define or->varlist
   (lambda (or-)
     (cond
       [(null? or-) '()]
-      [(not (number? (car or-))) (or->varlist (cdr or-))]
-      [(> (car or-) 0) (cons (car or-) (or->varlist (cdr or-)))]
-      [else (cons (* (car or-) -1) (or->varlist (cdr or-)))]
+      [(entero-no-cero? (car or-)) (cons (car or-) (or->varlist (cdr or-)))]
+      [else (or->varlist (cdr or-))]
     )
   )
 )
