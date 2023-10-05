@@ -63,6 +63,7 @@
 (define-datatype t-expresion-FNC expresion-FNC?
   (v-expresion-FNC (-FNC- simbolo-FNC?) (-entero-mayo-a-cero- entero-mayor-a-cero?) (c-conjuncion-de-clausulas t-conjuncion-de-clausulas?))
 )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Función PARSEBNF
@@ -101,6 +102,7 @@
 (define arbol_de_sintaxis (PARSEBNF '(FNC 3 ((-2 or -1) and (-3 or 2 or 1) and (1)))))
 (newline)
 (display arbol_de_sintaxis)
+(newline)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,4 +110,49 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Unparser
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define UNPARSEBNF-variable-o--variable
+  (lambda (t-var-o--var)
+    (cases t-variable-o--variable t-var-o--var
+      (v-entero-diferente-a-cero (entero) entero)
+    )
+  )
+)
+
+(define UNPARSEBNF-clausula
+  (lambda (t-clau)
+    (cases t-clausula t-clau
+      (v-variable-o--variable (c-variable-o--variable) (UNPARSEBNF-variable-o--variable c-variable-o--variable))
+      (v-variable-o--variable-or-clausula (c-variable-o--variable -or- c-clausula) (list (UNPARSEBNF-variable-o--variable c-variable-o--variable) -or- (UNPARSEBNF-clausula c-clausula)))
+    )
+  )
+)
+
+(define UNPARSEBNF-conjuncion-de-clausulas
+  (lambda (t-con-de-clau)
+    (cases t-conjuncion-de-clausulas t-con-de-clau
+      (v-clausula (c-clausula) (UNPARSEBNF-clausula c-clausula))
+      (v-clausula-conjuncion-de-clausulas (c-clausula -and- c-conjuncion-de-clausulas) (list (UNPARSEBNF-clausula c-clausula) -and- (UNPARSEBNF-conjuncion-de-clausulas c-conjuncion-de-clausulas)))
+    )
+  )
+)
+
+(define UNPARSEBNF
+  (lambda (t-exp)
+    (cases t-expresion-FNC t-exp
+      (v-expresion-FNC (-FNC- -entero-mayo-a-cero- c-conjuncion-de-clausulas) (list -FNC- -entero-mayo-a-cero- (UNPARSEBNF-conjuncion-de-clausulas c-conjuncion-de-clausulas)))
+    )
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Representacion concreta basada en listas
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define representacion_concreta (UNPARSEBNF (v-expresion-FNC 'FNC 3 (v-clausula-conjuncion-de-clausulas (v-variable-o--variable-or-clausula (v-entero-diferente-a-cero 3) 'or (v-variable-o--variable-or-clausula (v-entero-diferente-a-cero -2) 'or (v-variable-o--variable (v-entero-diferente-a-cero -1)))) 'and (v-clausula-conjuncion-de-clausulas (v-variable-o--variable (v-entero-diferente-a-cero -1)) 'and (v-clausula (v-variable-o--variable-or-clausula (v-entero-diferente-a-cero 2) 'or (v-variable-o--variable (v-entero-diferente-a-cero 1)))))))))
+(newline)
+(display representacion_concreta)
+(newline)
