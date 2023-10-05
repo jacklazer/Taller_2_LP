@@ -431,3 +431,73 @@
 (newline)
 (display t-fnc_6)
 (newline)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Evaluación de Instancias SAT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (make-list n value)
+  (if (= n 0)
+      '()
+      (cons value (make-list (- n 1) value))))
+
+(define (evaluar-clausula clausula asignacion)
+  (cond
+    [(null? clausula) #t] 
+    [(list? clausula)
+     (or (evaluar-clausula (car clausula) asignacion)
+         (evaluar-clausula (cdr clausula) asignacion))]
+    [else (and (eq? clausula (car asignacion))
+               (evaluar-clausula '() (cdr asignacion)))]))
+
+(define (evaluar-conjuncion conjuncion asignacion)
+  (cond
+    [(null? conjuncion) #t]
+    [else (and (evaluar-clausula (car conjuncion) asignacion)
+                (evaluar-conjuncion (cdr conjuncion) asignacion))]))
+
+(define (EVALUARSAT instancia)
+  (define valor-entero (fnc->var instancia))
+  (define conjuncion-clausulas (caddr instancia))
+  (define num-variables (aux-fnc->clausulas conjuncion-clausulas))
+
+  (define (generar-asignaciones n)
+    (if (= n 0)
+        (list (make-list num-variables #f))
+        (append (map (lambda (asignacion)
+                       (cons #t asignacion))
+                     (generar-asignaciones (- n 1)))
+                (map (lambda (asignacion)
+                       (cons #f asignacion))
+                     (generar-asignaciones (- n 1))))))
+  
+  (define asignaciones (generar-asignaciones num-variables))
+
+  (define (encontrar-satisfaccion asignaciones)
+    (cond
+      [(null? asignaciones) '()] 
+      [else (let ((asignacion (car asignaciones)))
+              (if (evaluar-conjuncion conjuncion-clausulas asignacion)
+                  (cons 'satisfactible asignacion)
+                  (encontrar-satisfaccion (cdr asignaciones))))]))
+
+  (define resultado (encontrar-satisfaccion asignaciones))
+
+  (if (eq? (car resultado) 'satisfactible)
+      resultado
+      '(insatisfactible '())))
+
+
+(define instancia1 (fnc 2
+  (list (list 1 2)
+        (list -1)
+        (list -2))))
+
+(display (EVALUARSAT instancia1))
+
+
+
+
+
+
